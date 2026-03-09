@@ -5,15 +5,20 @@ use std::{
     thread,
     time::Duration,
 };
+use web_server::ThreadPool;
+
 
 
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").expect("failed to bind");
+    let pool = ThreadPool::new(4);
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
-        handle_request(stream)
+        pool.execute(|| {
+            handle_request(stream)
+        });
     }
 }
 
